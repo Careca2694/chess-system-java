@@ -8,11 +8,23 @@ import chess.chess.pieces.Rook;
 
 public class ChessMatch{
 
+    private int turn;
+    private Color currentPlayer;
     private Board board;
 
     public ChessMatch(){
         board = new Board(8, 8);
+        turn = 1;
+        currentPlayer = Color.WHITE;
         initialSetup();
+    }
+
+    public int getTurn(){
+        return turn;
+    }
+
+    public Color getCurrentPlayer(){
+        return currentPlayer;
     }
 
     public ChessPiece[][]getPieces(){
@@ -27,15 +39,17 @@ public class ChessMatch{
 
     public boolean [][] possibleMoves(ChessPosition sourcePosition){
         Position p = sourcePosition.toPosition();
-        ValidateSourcePositon(p);
+        validateSourcePositon(p);
         return board.piece(p).possibleMoves();
     }
 
     public ChessPiece performChessMovie(ChessPosition sourcePosition, ChessPosition targetPosition){
          Position source = sourcePosition.toPosition();
          Position target = targetPosition.toPosition();
-         ValidateSourcePositon(source);
+         validateSourcePositon(source);
+         validateTargetPosition(source, target);
          Piece capturedPiece = makeMove(source , target);
+         nextTurn();
          return (ChessPiece) capturedPiece;
     }
 
@@ -46,13 +60,30 @@ public class ChessMatch{
         return capturedPiece;
     }
 
-    private void ValidateSourcePositon(Position p){
+    private void validateSourcePositon(Position p){
         if(!board.thereIsPiece(p)){
             throw new ChessException("Nao tem espaco nessa posicao");
         }
+
+        if(currentPlayer != ((ChessPiece)board.piece(p)).getColor()){
+            throw new ChessException("a peca escolhida nao e sua");
+        }
+
         if(!board.piece(p).isThereAnyPossibleMove()){
             throw new ChessException("Nao e possivel movimentar a peca.");
         }
+    }
+
+
+    private void validateTargetPosition(Position source, Position target){
+        if(!board.piece(source).possibleMove(target)){
+            throw new ChessException("o dado escolhido nao pode mover");
+        }
+    }
+
+    private void nextTurn(){
+        turn++;
+        currentPlayer = (currentPlayer == Color.WHITE) ? Color.BLACK : Color.WHITE;
     }
 
     private void placeNewPiece(char column, int row, ChessPiece piece) {
