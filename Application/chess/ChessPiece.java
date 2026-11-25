@@ -2,6 +2,7 @@ package chess;
 
 import boardgame.Board;
 import boardgame.Piece;
+import boardgame.Position;
 
 public abstract class ChessPiece extends Piece {
 
@@ -12,8 +13,17 @@ public abstract class ChessPiece extends Piece {
        this.color = color;
    } 
 
+   public ChessPosition getChessPosition(){
+    return ChessPosition.fromPosition(position);
+   }
+
    public Color getColor(){
      return color;
+   }
+
+   protected boolean isThereOpennentPiece(Position p){
+    ChessPiece piece = (ChessPiece)getBoard().piece(p);
+    return piece != null && piece.getColor() != color;
    }
     
 }
